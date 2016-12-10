@@ -1,7 +1,6 @@
 const assert = require('assert');
 const fetch = require('node-fetch');
 const lodash = require('lodash');
-const logger = require('winston');
 const Promise = require('bluebird');
 
 const Koa = require('koa');
@@ -13,6 +12,9 @@ const state = {};
 const config = {
     port: 8765
 };
+
+const logger = require('winston');
+logger.level = config.loggingLevel || 'debug';
 
 async function start() {
     api.get('/echo/*', async ctx => {

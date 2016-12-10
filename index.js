@@ -42,7 +42,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 const assert = require('assert');
 const fetch = require('node-fetch');
 const lodash = require('lodash');
-const logger = require('winston');
 const Promise = require('bluebird');
 
 const Koa = require('koa');
@@ -54,6 +53,9 @@ const state = {};
 const config = {
     port: 8765
 };
+
+const logger = require('winston');
+logger.level = config.loggingLevel || 'debug';
 
 start().catch(err => {
     logger.error(err);
