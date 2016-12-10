@@ -15,8 +15,12 @@ const config = {
 };
 
 async function start() {
-    api.get('/*', async ctx => {
+    api.get('/echo/*', async ctx => {
         ctx.body = JSON.stringify({url: ctx.request.url});
+    });
+    api.post('/webhook/*', async ctx => {
+        ctx.body = '';
+        logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
     });
     app.use(api.routes());
     app.use(async ctx => {

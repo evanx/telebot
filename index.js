@@ -1,6 +1,6 @@
 let start = (() => {
     var _ref = _asyncToGenerator(function* () {
-        api.get('/*', (() => {
+        api.get('/echo/*', (() => {
             var _ref2 = _asyncToGenerator(function* (ctx) {
                 ctx.body = JSON.stringify({ url: ctx.request.url });
             });
@@ -9,14 +9,24 @@ let start = (() => {
                 return _ref2.apply(this, arguments);
             };
         })());
-        app.use(api.routes());
-        app.use((() => {
+        api.post('/webhook/*', (() => {
             var _ref3 = _asyncToGenerator(function* (ctx) {
-                ctx.statusCode = 501;
+                ctx.body = '';
+                logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
             });
 
             return function (_x2) {
                 return _ref3.apply(this, arguments);
+            };
+        })());
+        app.use(api.routes());
+        app.use((() => {
+            var _ref4 = _asyncToGenerator(function* (ctx) {
+                ctx.statusCode = 501;
+            });
+
+            return function (_x3) {
+                return _ref4.apply(this, arguments);
             };
         })());
         state.server = app.listen(config.port);
