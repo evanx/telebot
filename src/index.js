@@ -26,7 +26,7 @@ async function start() {
         logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
     });
     app.use(bodyParser());
-    app.use(api.routes());    
+    app.use(api.routes());
     app.use(async ctx => {
        ctx.statusCode = 501;
     });
