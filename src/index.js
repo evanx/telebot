@@ -23,7 +23,7 @@ async function start() {
     });
     api.post('/webhook/*', async ctx => {
         ctx.body = '';
-        logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
+        logger.debug('webhook', ctx.request.url, JSON.stringify(ctx.request.body, null, 2));
     });
     app.use(bodyParser());
     app.use(api.routes());

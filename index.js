@@ -12,7 +12,7 @@ let start = (() => {
         api.post('/webhook/*', (() => {
             var _ref3 = _asyncToGenerator(function* (ctx) {
                 ctx.body = '';
-                logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
+                logger.debug('webhook', ctx.request.url, JSON.stringify(ctx.request.body, null, 2));
             });
 
             return function (_x2) {
