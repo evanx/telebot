@@ -1,40 +1,55 @@
+let multiExecAsync = (() => {
+    var _ref = _asyncToGenerator(function* (client, multiFunction) {
+        const multi = client.multi();
+        multiFunction(multi);
+        return Promise.promisify(multi.exec).call(multi);
+    });
+
+    return function multiExecAsync(_x, _x2) {
+        return _ref.apply(this, arguments);
+    };
+})();
+
 let start = (() => {
-    var _ref = _asyncToGenerator(function* () {
+    var _ref2 = _asyncToGenerator(function* () {
         api.get('/echo/*', (() => {
-            var _ref2 = _asyncToGenerator(function* (ctx) {
+            var _ref3 = _asyncToGenerator(function* (ctx) {
                 ctx.body = JSON.stringify({ url: ctx.request.url });
             });
 
-            return function (_x) {
-                return _ref2.apply(this, arguments);
+            return function (_x3) {
+                return _ref3.apply(this, arguments);
             };
         })());
         api.post('/webhook/*', (() => {
-            var _ref3 = _asyncToGenerator(function* (ctx) {
+            var _ref4 = _asyncToGenerator(function* (ctx) {
                 ctx.body = '';
                 logger.debug('webhook', ctx.request.url, JSON.stringify(ctx.request.body, null, 2));
+                multiExecAsync(client, function (multi) {
+                    multi.publish([config.serviceName, ctx.params[0]].join(':'), JSON.stringify(ctx.request.body));
+                });
             });
 
-            return function (_x2) {
-                return _ref3.apply(this, arguments);
+            return function (_x4) {
+                return _ref4.apply(this, arguments);
             };
         })());
         app.use(bodyParser());
         app.use(api.routes());
         app.use((() => {
-            var _ref4 = _asyncToGenerator(function* (ctx) {
+            var _ref5 = _asyncToGenerator(function* (ctx) {
                 ctx.statusCode = 501;
             });
 
-            return function (_x3) {
-                return _ref4.apply(this, arguments);
+            return function (_x5) {
+                return _ref5.apply(this, arguments);
             };
         })());
         state.server = app.listen(config.port);
     });
 
     return function start() {
-        return _ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 })();
 
@@ -52,12 +67,17 @@ const app = new Koa();
 const api = KoaRouter();
 const state = {};
 
+const redis = require('redis');
+const client = Promise.promisifyAll(redis.createClient());
+
 const config = {
-    port: 8765
+    port: 8765,
+    serviceName: 'telebot',
+    loggerLevel: 'debug'
 };
 
 const logger = require('winston');
-logger.level = config.loggingLevel || 'debug';
+logger.level = config.loggerLevel || 'info';
 
 start().catch(err => {
     logger.error(err);

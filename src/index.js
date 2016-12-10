@@ -10,12 +10,23 @@ const app = new Koa();
 const api = KoaRouter();
 const state = {};
 
+const redis = require('redis');
+const client = Promise.promisifyAll(redis.createClient());
+
+async function multiExecAsync(client, multiFunction) {
+   const multi = client.multi();
+   multiFunction(multi);
+   return Promise.promisify(multi.exec).call(multi);
+}
+
 const config = {
-    port: 8765
+    port: 8765,
+    serviceName: 'telebot',
+    loggerLevel: 'debug'
 };
 
 const logger = require('winston');
-logger.level = config.loggingLevel || 'debug';
+logger.level = config.loggerLevel || 'info';
 
 async function start() {
     api.get('/echo/*', async ctx => {
@@ -24,6 +35,9 @@ async function start() {
     api.post('/webhook/*', async ctx => {
         ctx.body = '';
         logger.debug('webhook', ctx.request.url, JSON.stringify(ctx.request.body, null, 2));
+        multiExecAsync(client, multi => {
+            multi.publish([config.serviceName, ctx.params[0]].join(':'), JSON.stringify(ctx.request.body));
+        });
     });
     app.use(bodyParser());
     app.use(api.routes());
