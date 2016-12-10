@@ -19,6 +19,7 @@ let start = (() => {
                 return _ref3.apply(this, arguments);
             };
         })());
+        app.use(bodyParser());
         app.use(api.routes());
         app.use((() => {
             var _ref4 = _asyncToGenerator(function* (ctx) {
@@ -46,6 +47,7 @@ const Promise = require('bluebird');
 
 const Koa = require('koa');
 const KoaRouter = require('koa-router');
+const bodyParser = require('koa-bodyparser');
 const app = new Koa();
 const api = KoaRouter();
 const state = {};

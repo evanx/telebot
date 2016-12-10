@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 
 const Koa = require('koa');
 const KoaRouter = require('koa-router');
+const bodyParser = require('koa-bodyparser');
 const app = new Koa();
 const api = KoaRouter();
 const state = {};
@@ -24,7 +25,8 @@ async function start() {
         ctx.body = '';
         logger.debug('webhook', JSON.stringify(ctx.request, null, 2));
     });
-    app.use(api.routes());
+    app.use(bodyParser());
+    app.use(api.routes());    
     app.use(async ctx => {
        ctx.statusCode = 501;
     });
